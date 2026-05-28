@@ -31,6 +31,22 @@ public class SimuladorPartidoFifa implements SimuladorPartido {
                                     boolean permiteEmpate) {
         long inicio = System.nanoTime();
 
+        // ============================================================
+        // Retardo artificial: simula que un partido "toma tiempo"
+        // (en la vida real sería: queries a BD, cálculos pesados, etc.)
+        // Esto NO afecta la lógica, solo hace visible el paralelismo.
+        //
+        // Entre 200 y 400 ms aleatorio: variabilidad realista.
+        // ============================================================
+        /*try {
+            int retardoMs = 200 + ThreadLocalRandom.current().nextInt(200);
+            Thread.sleep(retardoMs);
+        } catch (InterruptedException e) {
+            // Si nos interrumpen, restauramos el flag y salimos limpiamente
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Simulación interrumpida", e);
+        }*/
+
         // Probabilidad de victoria del local (entre 0 y 1)
         double probLocal = calcularProbabilidad(local, visitante);
 
