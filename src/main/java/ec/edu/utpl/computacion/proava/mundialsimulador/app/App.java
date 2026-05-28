@@ -28,7 +28,7 @@ public class App {
         mostrarAnfitriones(equipoDAO);
         probarBusquedaPorCodigo(equipoDAO);
 
-        probarSimuladorConGrupoI(grupoDAO);
+        probarSimuladorConGrupoE(grupoDAO);
     }
 
     private static void mostrarResumen(
@@ -122,68 +122,87 @@ public class App {
         System.out.println();
     }
 
-    private static void probarSimuladorConGrupoI(GrupoDAO grupoDAO) {
+    private static void probarSimuladorConGrupoE(GrupoDAO grupoDAO) {
         System.out.println();
-        System.out.println("Prueba del simulador: Grupo I del Mundial");
+        System.out.println("Prueba del simulador: Grupo E del Mundial");
         System.out.println("==========================================");
 
-        Grupo grupoI = grupoDAO
-            .buscarPorNombre("I")
-            .orElseThrow(() -> new RuntimeException("Grupo I no encontrado"));
+        Grupo grupoE = grupoDAO
+            .buscarPorNombre("E")
+            .orElseThrow(() -> new RuntimeException("Grupo E no encontrado"));
 
         SimuladorPartido simulador = new SimuladorPartidoFifa();
 
-        // Los 6 enfrentamientos de un grupo de 4 (combinaciones C(4,2))
-        List<Equipo> equipos = grupoI.getEquipos();
-        System.out.println("\nUna simulación de cada enfrentamiento:");
-        for (int i = 0; i < equipos.size(); i++) {
-            for (int j = i + 1; j < equipos.size(); j++) {
-                Equipo local = equipos.get(i);
-                Equipo visitante = equipos.get(j);
-                ResultadoPartido r = simulador.simular(local, visitante, true);
-                System.out.println("  " + r);
-            }
+        List<Equipo> equipos = grupoE.getEquipos();
+        Equipo alemania = equipos.get(0);
+        Equipo curazao = equipos.get(1);
+        Equipo costaMarfil = equipos.get(2);
+        Equipo ecuador = equipos.get(3);
+
+        System.out.println("\nUna simulación de cada partido de Ecuador:");
+        for (Equipo rival : List.of(alemania, curazao, costaMarfil)) {
+            ResultadoPartido r = simulador.simular(ecuador, rival, true);
+            System.out.println("  " + r);
         }
 
-        // Análisis de 1000 simulaciones de Francia vs Iraq
-        System.out.println("\n1000 simulaciones de Francia vs Iraq:");
-        Equipo francia = equipos.get(0); // posición 1: Francia
-        Equipo iraq = equipos.get(2); // posición 3: Iraq
-
-        int ganaFra = 0,
-            empates = 0,
-            ganaIrq = 0;
-        int totalGolesFra = 0,
-            totalGolesIrq = 0;
-
+        System.out.println("\n1000 simulaciones de Ecuador vs Alemania:");
+        int ganaEcu = 0, empatesGer = 0, ganaGer = 0;
+        int totalGolesEcuGer = 0, totalGolesGer = 0;
         for (int n = 0; n < 1000; n++) {
-            ResultadoPartido r = simulador.simular(francia, iraq, true);
-            totalGolesFra += r.getGolesLocal();
-            totalGolesIrq += r.getGolesVisitante();
-            if (r.esEmpate()) empates++;
-            else if (r.getGanador().equals(francia)) ganaFra++;
-            else ganaIrq++;
+            ResultadoPartido r = simulador.simular(ecuador, alemania, true);
+            totalGolesEcuGer += r.getGolesLocal();
+            totalGolesGer += r.getGolesVisitante();
+            if (r.esEmpate()) empatesGer++;
+            else if (r.getGanador().equals(ecuador)) ganaEcu++;
+            else ganaGer++;
         }
+        System.out.printf("  Ecuador gana: %3d%% (%d veces)%n", ganaEcu / 10, ganaEcu);
+        System.out.printf("  Empate:       %3d%% (%d veces)%n", empatesGer / 10, empatesGer);
+        System.out.printf("  Alemania gana:%3d%% (%d veces)%n", ganaGer / 10, ganaGer);
+        System.out.printf(
+            "  Goles promedio: Ecuador %.2f - Alemania %.2f%n",
+            totalGolesEcuGer / 1000.0,
+            totalGolesGer / 1000.0
+        );
 
+        System.out.println("\n1000 simulaciones de Ecuador vs Curazao:");
+        int ganaEcuCuw = 0, empatesCuw = 0, ganaCuw = 0;
+        int totalGolesEcuCuw = 0, totalGolesCuw = 0;
+        for (int n = 0; n < 1000; n++) {
+            ResultadoPartido r = simulador.simular(ecuador, curazao, true);
+            totalGolesEcuCuw += r.getGolesLocal();
+            totalGolesCuw += r.getGolesVisitante();
+            if (r.esEmpate()) empatesCuw++;
+            else if (r.getGanador().equals(ecuador)) ganaEcuCuw++;
+            else ganaCuw++;
+        }
+        System.out.printf("  Ecuador gana: %3d%% (%d veces)%n", ganaEcuCuw / 10, ganaEcuCuw);
+        System.out.printf("  Empate:       %3d%% (%d veces)%n", empatesCuw / 10, empatesCuw);
+        System.out.printf("  Curazao gana: %3d%% (%d veces)%n", ganaCuw / 10, ganaCuw);
         System.out.printf(
-            "  Francia gana: %3d%% (%d veces)%n",
-            ganaFra / 10,
-            ganaFra
+            "  Goles promedio: Ecuador %.2f - Curazao %.2f%n",
+            totalGolesEcuCuw / 1000.0,
+            totalGolesCuw / 1000.0
         );
+
+        System.out.println("\n1000 simulaciones de Ecuador vs Costa de Marfil:");
+        int ganaEcuCiv = 0, empatesCiv = 0, ganaCiv = 0;
+        int totalGolesEcuCiv = 0, totalGolesCiv = 0;
+        for (int n = 0; n < 1000; n++) {
+            ResultadoPartido r = simulador.simular(ecuador, costaMarfil, true);
+            totalGolesEcuCiv += r.getGolesLocal();
+            totalGolesCiv += r.getGolesVisitante();
+            if (r.esEmpate()) empatesCiv++;
+            else if (r.getGanador().equals(ecuador)) ganaEcuCiv++;
+            else ganaCiv++;
+        }
+        System.out.printf("  Ecuador gana: %3d%% (%d veces)%n", ganaEcuCiv / 10, ganaEcuCiv);
+        System.out.printf("  Empate:       %3d%% (%d veces)%n", empatesCiv / 10, empatesCiv);
+        System.out.printf("  Costa de Marfil gana: %3d%% (%d veces)%n", ganaCiv / 10, ganaCiv);
         System.out.printf(
-            "  Empate:       %3d%% (%d veces)%n",
-            empates / 10,
-            empates
-        );
-        System.out.printf(
-            "  Iraq gana:    %3d%% (%d veces)%n",
-            ganaIrq / 10,
-            ganaIrq
-        );
-        System.out.printf(
-            "  Goles promedio: Francia %.2f - Iraq %.2f%n",
-            totalGolesFra / 1000.0,
-            totalGolesIrq / 1000.0
+            "  Goles promedio: Ecuador %.2f - Costa de Marfil %.2f%n",
+            totalGolesEcuCiv / 1000.0,
+            totalGolesCiv / 1000.0
         );
     }
 }
